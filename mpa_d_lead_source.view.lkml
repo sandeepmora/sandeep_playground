@@ -1,66 +1,22 @@
 view: mpa_d_lead_source {
-  sql_table_name: simon12_warehouse.mpa_d_lead_source ;;
-
-  dimension: category {
-    type: string
-    sql: ${TABLE}.category ;;
-  }
-
-  dimension_group: created {
-    type: time
-    timeframes: [
-      raw,
-      time,
-      date,
-      week,
-      month,
-      quarter,
-      year
-    ]
-    sql: ${TABLE}.created_at ;;
-  }
-
-  dimension: etl_history_key {
-    type: number
-    sql: ${TABLE}.etl_history_key ;;
-  }
-
-  dimension: is_active {
-    type: yesno
-    sql: ${TABLE}.is_active ;;
-  }
+  sql_table_name: mpa_d_lead_source ;;
 
   dimension: lead_source_key {
     type: number
+    hidden: yes
     sql: ${TABLE}.lead_source_key ;;
-  }
-
-  dimension: name {
-    type: string
-    sql: ${TABLE}.name ;;
   }
 
   dimension: source_id {
     type: string
+    hidden: yes
     sql: ${TABLE}.source_id ;;
   }
 
-  dimension_group: updated {
-    type: time
-    timeframes: [
-      raw,
-      time,
-      date,
-      week,
-      month,
-      quarter,
-      year
-    ]
-    sql: ${TABLE}.updated_at ;;
+  dimension: name {
+    type: string
+    label: "Lead Source"
+    sql: ${TABLE}.name ;;
   }
 
-  measure: count {
-    type: count
-    drill_fields: [name]
-  }
 }

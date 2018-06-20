@@ -1,7 +1,20 @@
 view: mpa_d_link {
-  sql_table_name: simon12_warehouse.mpa_d_link ;;
+  sql_table_name: mpa_d_link ;;
+
+  dimension: link_key {
+    hidden: yes
+    type: number
+    sql: ${TABLE}.link_key ;;
+  }
+
+  dimension: link_url {
+    type: string
+    label: "Email Link"
+    sql: ${TABLE}.link_url ;;
+  }
 
   dimension_group: created {
+    hidden: yes
     type: time
     timeframes: [
       raw,
@@ -15,17 +28,8 @@ view: mpa_d_link {
     sql: ${TABLE}.created_at ;;
   }
 
-  dimension: link_key {
-    type: number
-    sql: ${TABLE}.link_key ;;
-  }
-
-  dimension: link_url {
-    type: string
-    sql: ${TABLE}.link_url ;;
-  }
-
   measure: count {
+    hidden: yes
     type: count
     drill_fields: []
   }

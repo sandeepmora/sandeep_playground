@@ -1,5 +1,5 @@
 view: mpa_d_date {
-  sql_table_name: simon12_warehouse.mpa_d_date ;;
+  sql_table_name: mpa_d_date ;;
 
   dimension_group: date {
     type: time

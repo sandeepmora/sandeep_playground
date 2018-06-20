@@ -1,5 +1,20 @@
 view: mpa_d_company {
-  sql_table_name: simon12_warehouse.mpa_d_company ;;
+  sql_table_name: mpa_d_company ;;
+
+##### Join Keys #####
+  dimension: company_key {
+    type: number
+    hidden: yes
+    sql: ${TABLE}.company_key ;;
+  }
+
+##### Attributes #####
+  dimension: source_id {
+    type: string
+    label: "Company ID"
+    hidden: yes
+    sql: ${TABLE}.source_id ;;
+  }
 
   dimension: annual_revenue {
     type: number
@@ -8,148 +23,94 @@ view: mpa_d_company {
 
   dimension: city {
     type: string
+    label: "Billing City"
     sql: ${TABLE}.city ;;
   }
 
-  dimension: company_key {
-    type: number
-    sql: ${TABLE}.company_key ;;
+  dimension: state {
+    type: string
+    label: "Billing State"
+    sql: ${TABLE}.state ;;
   }
 
   dimension: country {
     type: string
+    label: "Billing Country"
     map_layer_name: countries
     sql: ${TABLE}.country ;;
   }
 
-  dimension_group: created {
-    type: time
-    timeframes: [
-      raw,
-      time,
-      date,
-      week,
-      month,
-      quarter,
-      year
-    ]
-    sql: ${TABLE}.created_at ;;
-  }
-
-  dimension: etl_history_key {
-    type: number
-    sql: ${TABLE}.etl_history_key ;;
+  dimension: postal_code {
+    type: string
+    label: "Billing Postal Code"
+    sql: ${TABLE}.postal_code ;;
   }
 
   dimension: industry {
     type: string
+    label: "Industry"
     sql: ${TABLE}.industry ;;
-  }
-
-  dimension: is_active {
-    type: yesno
-    sql: ${TABLE}.is_active ;;
-  }
-
-  dimension: is_private {
-    type: yesno
-    sql: ${TABLE}.is_private ;;
-  }
-
-  dimension: is_sfdc_deleted {
-    type: yesno
-    sql: ${TABLE}.is_sfdc_deleted ;;
   }
 
   dimension: name {
     type: string
+    label: "Company Name"
     sql: ${TABLE}.name ;;
   }
 
   dimension: number_of_employees {
     type: number
+    label: "Number of Employees"
     sql: ${TABLE}.number_of_employees ;;
-  }
-
-  dimension: postal_code {
-    type: string
-    sql: ${TABLE}.postal_code ;;
-  }
-
-  dimension: sfdc_account_id {
-    type: string
-    sql: ${TABLE}.sfdc_account_id ;;
   }
 
   dimension: sic_code {
     type: string
+    label: "SIC Code"
     sql: ${TABLE}.sic_code ;;
   }
 
-  dimension_group: source_created {
-    type: time
-    timeframes: [
-      raw,
-      time,
-      date,
-      week,
-      month,
-      quarter,
-      year
-    ]
-    sql: ${TABLE}.source_created_at ;;
+##### Measures #####
+  measure: company_count {
+    type: count_distinct
+    label: "Number of Companies"
+    sql: ${TABLE}.company_key ;;
+    drill_fields: [company_details*]
   }
 
-  dimension: source_id {
-    type: string
-    sql: ${TABLE}.source_id ;;
+  measure: company_converted_to_opportunity_count {
+    type: count_distinct
+    label: "Number of Companies (Converted to Opportunity)"
+    sql: case when ${mpa_d_lead.is_converted_to_opportunity} = 1 then ${TABLE}.company_key else null end ;;
+    drill_fields: [company_details*]
   }
 
-  dimension_group: source_updated {
-    type: time
-    timeframes: [
-      raw,
-      time,
-      date,
-      week,
-      month,
-      quarter,
-      year
-    ]
-    sql: ${TABLE}.source_updated_at ;;
+  measure: company_not_converted_to_opportunity_count {
+    type: count_distinct
+    label: "Number of Companies (Not Converted to Opportunity)"
+    sql: case when ${mpa_d_lead.is_converted_to_opportunity} = 0 then ${TABLE}.company_key else null end ;;
+    drill_fields: [company_details*]
   }
 
-  dimension: state {
-    type: string
-    sql: ${TABLE}.state ;;
-  }
-
-  dimension_group: updated {
-    type: time
-    timeframes: [
-      raw,
-      time,
-      date,
-      week,
-      month,
-      quarter,
-      year
-    ]
-    sql: ${TABLE}.updated_at ;;
-  }
-
-  dimension: x_691_simon_acct_custom_text {
-    type: string
-    sql: ${TABLE}.X_691_simon_acct_custom_text ;;
-  }
-
-  dimension: x_691_simon_sfdc_cust_acct {
+  measure: company_to_opportunity_conversion_ratio {
     type: number
-    sql: ${TABLE}.X_691_simon_sfdc_cust_acct ;;
+    label: "Company to Opportunity Conversion Ratio"
+    sql: coalesce(${mpa_d_company.company_converted_to_opportunity_count}/${mpa_d_company.company_count}, 0) ;;
+    value_format: "0.00%"
   }
 
-  measure: count {
-    type: count
-    drill_fields: [name]
+  set: company_details {
+    fields: [source_id, name]
   }
+
+
+  # dimension: x_691_simon_acct_custom_text {
+  #   type: string
+  #   sql: ${TABLE}.X_691_simon_acct_custom_text ;;
+  # }
+
+  # dimension: x_691_simon_sfdc_cust_acct {
+  #   type: number
+  #   sql: ${TABLE}.X_691_simon_sfdc_cust_acct ;;
+  # }
 }
